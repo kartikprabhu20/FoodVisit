@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ListPreference
+        android:title="@string/Place"
+        android:key="@string/pref_place_key"
+        android:summary="@string/pref_place"
+        android:defaultValue="@string/prefer_bangalore_value"
+        android:entryValues="@array/pref_order_values"
+        android:entries="@array/pref_order_options"/>
+
+</PreferenceScreen>

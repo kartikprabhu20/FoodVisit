@@ -1,0 +1,27 @@
+<resources>
+    <!--
+    To get one, follow this link, follow the directions and press "Create" at the end:
+
+    https://console.developers.google.com/flows/enableapi?apiid=maps_android_backend&keyType=CLIENT_SIDE_ANDROID&r=BE:C2:A0:28:29:4D:D7:F8:16:82:78:67:EF:BE:98:81:46:84:4B:FA%3Bcom.foodie.foodvisit
+
+    You can also add your credentials to an existing key, using these values:
+
+    Package name:
+    BE:C2:A0:28:29:4D:D7:F8:16:82:78:67:EF:BE:98:81:46:84:4B:FA
+
+    SHA-1 certificate fingerprint:
+    BE:C2:A0:28:29:4D:D7:F8:16:82:78:67:EF:BE:98:81:46:84:4B:FA
+
+    Alternatively, follow the directions here:
+    https://developers.google.com/maps/documentation/android/start#get-key
+
+    Once you have your key (it starts with "AIza"), replace the "google_maps_key"
+    string in this file.
+    -->
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false"> insert </string>
+    <string name="admob_ad_id" templateMergeStrategy="preserve" translatable="false">insert</string>
+    <string name="zomato_id" templateMergeStrategy="preserve" translatable="false">insert</string>
+
+    <!--build-it-bigger: ca-app-pub-3940256099942544/6300978111--> 
+    <!--new : ca-app-pub-2726462818265307/1830905972-->
+</resources>

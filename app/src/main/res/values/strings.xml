@@ -1,0 +1,72 @@
+<resources>
+    <string name="app_name">FoodVisit</string>
+    <string name="title_activity_maps">Map</string>
+
+    <!-- Navigation Drawer menu labels -->
+    <string name="nav_home">Home</string>
+    <string name="nav_maps">Maps</string>
+    <string name="nav_tovisit">ToVisit</string>
+    <string name="nav_settings">Settings</string>
+    <string name="nav_about_us">About Us</string>
+
+    <!-- Toolbar titles when navigation menu item is selected -->
+    <string-array name="nav_item_activity_titles">
+        <item>Home</item>
+        <item>Photos</item>
+        <item>Movies</item>
+        <item>Settings</item>
+    </string-array>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_place">Place</string>
+    <string name="restaurants_retrieve_error">Could not parse restaurant values</string>
+    <string name="no_connection">No Internet Connection</string>
+    <string name="unknown">UNKNOWN</string>
+    <string name="question_mark">\????</string>
+    <string name="title_detail_activity">Detail activity</string>
+
+    <string name="cost_for_two">Cost for two:</string>
+    <string name="minimum_order">Minimum order:</string>
+    <string name="price_range">Price range:</string>
+    <string name="user_rating">User rating:</string>
+    <string name="online_available">Online available:</string>
+    <string name="has_table_booking">Has table booking:</string>
+    <string name="available_yes">YES</string>
+    <string name="available_no">NO</string>
+
+    <string name="location">LOCATION:</string>
+    <string name="address">Address:</string>
+    <string name="locality">Locality:</string>
+    <string name="city">City:</string>
+    <string name="zipcode">Zipcode:</string>
+    <string name="details">DETAILS:</string>
+
+    <string name="user_reviews">USER REVIEWS:</string>
+    <string name="rating">Ratings:</string>
+    <string name="describe">Description:</string>
+    <string name="votes">Votes:</string>
+    <string name="no_tovisit_list">No ToVisit List</string>
+    <string name="add_widget">Add widget</string>
+
+    <string name="Add_to_to_visit">Add to visit list</string>
+    <string name="no_network_connection">No network connection</string>
+    <string name="restaurant_image">Restaurant image</string>
+    <string name="Place">PLACE</string>
+    <string name="pref_place_key">preference_key</string>
+    <string name="pref_place">City of restaurants</string>
+    <string name="pref_default_bangalore">Bangalore</string>
+
+    <string name="prefer_bangalore_value">4</string>
+    <string name="prefer_chennai_value">7</string>
+    <string name="prefer_delhi_value">1</string>
+    <string name="pref_kolkata_value">2</string>
+    <string name="prefer_bangalore">Bangalore</string>
+    <string name="prefer_chennai">Chennai</string>
+    <string name="prefer_delhi">Delhi</string>
+    <string name="pref_kolkata">Kolkata</string>
+    <string name="title_activity_settings">Settings</string>
+    <string name="summary_about_us">A young android enthusiast for whom life was made eady by Udacity and who is trying to making others life easy through his apps</string>
+    <string name="Other">Other</string>
+</resources>

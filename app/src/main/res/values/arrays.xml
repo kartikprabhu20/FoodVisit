@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="pref_order_options">
+        <item>@string/prefer_bangalore</item>
+        <item>@string/prefer_chennai</item>
+        <item>@string/prefer_delhi</item>
+        <item>@string/pref_kolkata</item>
+    </string-array>
+
+    <string-array name="pref_order_values">
+        <item>@string/prefer_bangalore_value</item>
+        <item>@string/prefer_chennai_value</item>
+        <item>@string/prefer_delhi_value</item>
+        <item>@string/pref_kolkata_value</item>
+    </string-array>
+
+</resources>
