@@ -26,5 +26,6 @@ deploy:
     file_glob: true
     skip_cleanup: true
     on:
-        tags: true
+        tags: release
         branch: master
+        
