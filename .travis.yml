@@ -12,11 +12,18 @@ android:
     - extra-google-m2repository 
     - addon-google_apis-google-24 
 BEFORE_INSTALL: 
-- ​​chmod + x gradlew 
+- ​​chmod +x gradlew 
 - export JAVA8_HOME = / usr / lib / jvm / java-8-oracle 
 - export JAVA_HOME = $ JAVA8_HOME 
-after_success: 
-- chmod + x ./upload-gh-pages. sh 
-- ./upload-apk.sh 
+
 script: 
 - ./gradlew build
+
+deploy:
+  - provider: releases
+    api_key: "$GITHUB_API_KEY"
+    file: app/build/outputs/apk/*
+    file_glob: true
+    skip_cleanup: true
+    on:
+        tags: master
