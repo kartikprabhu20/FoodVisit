@@ -1,6 +1,6 @@
 package com.mintanable.foodvisit.di
 
-import com.mintanable.foodvisit.service.RestaurantService
+import com.mintanable.foodvisit.data.remote.PlacesService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,7 +15,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
-    private const val BASE_URL = "https://developers.zomato.com/api/v2.1/"
+    private const val PLACES_BASE_URL = "https://places.googleapis.com/"
 
     @Provides
     @Singleton
@@ -30,13 +30,13 @@ object NetworkModule {
     @Singleton
     fun provideRetrofit(client: OkHttpClient): Retrofit =
         Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(PLACES_BASE_URL)
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
     @Provides
     @Singleton
-    fun provideRestaurantService(retrofit: Retrofit): RestaurantService =
-        retrofit.create(RestaurantService::class.java)
+    fun providePlacesService(retrofit: Retrofit): PlacesService =
+        retrofit.create(PlacesService::class.java)
 }

@@ -5,22 +5,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mintanable.foodvisit.AppPreferenceManager
 import com.mintanable.foodvisit.Utils
-import com.mintanable.foodvisit.model.RestaurantInfo
-import com.mintanable.foodvisit.service.RestaurantService
+import com.mintanable.foodvisit.data.model.Resource
+import com.mintanable.foodvisit.data.repository.PlacesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val service: RestaurantService,
+    private val repository: PlacesRepository,
     private val prefs: AppPreferenceManager,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
@@ -28,45 +27,41 @@ class HomeViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
-    private var lastLoadedLocation: String? = null
+    private var collectJob: Job? = null
+    private var lastLoadedCityId: String? = null
 
     init {
         loadRestaurants()
     }
 
     fun loadRestaurants() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
+        val cityId = prefs.getLocation()
+        lastLoadedCityId = cityId
 
-            if (!Utils.isOnline(context)) {
-                _uiState.update { it.copy(isLoading = false, isOffline = true) }
-                return@launch
-            }
-
-            val locationId = prefs.getLocation().toIntOrNull() ?: 4
-            val apiKey = Utils.getRestaurantApiKey()
-
-            try {
-                val response = withContext(Dispatchers.IO) {
-                    service.restaurantResult(apiKey, locationId, "city").execute()
+        collectJob?.cancel()
+        collectJob = viewModelScope.launch {
+            repository.getRestaurants(cityId).collect { resource ->
+                when (resource) {
+                    is Resource.Loading -> _uiState.update {
+                        it.copy(isLoading = true, error = null)
+                    }
+                    is Resource.Success -> _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            restaurants = resource.data,
+                            error = null,
+                            isOffline = !Utils.isOnline(context)
+                        )
+                    }
+                    is Resource.Error -> _uiState.update {
+                        it.copy(isLoading = false, error = resource.message, isOffline = true)
+                    }
                 }
-                val restaurants: List<RestaurantInfo> = response.body()
-                    ?.restaurants
-                    ?.mapNotNull { it.restaurantInfo }
-                    ?: emptyList()
-                lastLoadedLocation = prefs.getLocation()
-                _uiState.update {
-                    it.copy(isLoading = false, restaurants = restaurants, isOffline = false)
-                }
-            } catch (e: Exception) {
-                _uiState.update { it.copy(isLoading = false, error = e.message) }
             }
         }
     }
 
     fun refreshIfLocationChanged() {
-        if (lastLoadedLocation != prefs.getLocation()) {
-            loadRestaurants()
-        }
+        if (lastLoadedCityId != prefs.getLocation()) loadRestaurants()
     }
 }

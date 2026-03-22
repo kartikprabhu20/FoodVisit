@@ -1,7 +1,9 @@
 package com.mintanable.foodvisit.di
 
 import android.content.Context
-import com.mintanable.foodvisit.database.RestaurantDBHelper
+import androidx.room.Room
+import com.mintanable.foodvisit.data.local.FoodVisitDatabase
+import com.mintanable.foodvisit.data.local.dao.RestaurantDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,6 +17,12 @@ object DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideRestaurantDBHelper(@ApplicationContext context: Context): RestaurantDBHelper =
-        RestaurantDBHelper(context)
+    fun provideFoodVisitDatabase(@ApplicationContext context: Context): FoodVisitDatabase =
+        Room.databaseBuilder(context, FoodVisitDatabase::class.java, "foodvisit.db")
+            .fallbackToDestructiveMigration()
+            .build()
+
+    @Provides
+    @Singleton
+    fun provideRestaurantDao(db: FoodVisitDatabase): RestaurantDao = db.restaurantDao()
 }

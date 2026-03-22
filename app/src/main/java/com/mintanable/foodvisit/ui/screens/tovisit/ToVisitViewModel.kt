@@ -1,39 +1,26 @@
 package com.mintanable.foodvisit.ui.screens.tovisit
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mintanable.foodvisit.Utils
+import com.mintanable.foodvisit.data.repository.PlacesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
 class ToVisitViewModel @Inject constructor(
-    @ApplicationContext private val context: Context
+    repository: PlacesRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(ToVisitUiState())
-    val uiState: StateFlow<ToVisitUiState> = _uiState.asStateFlow()
-
-    init {
-        loadFromDb()
-    }
-
-    fun loadFromDb() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            val restaurants = withContext(Dispatchers.IO) {
-                Utils.getRestaurantInfoListFromDB(context)
-            }
-            _uiState.update { it.copy(isLoading = false, restaurants = restaurants) }
-        }
-    }
+    /** Live — auto-updates whenever the wishlist changes in Room. */
+    val uiState: StateFlow<ToVisitUiState> = repository.getWishlistedRestaurants()
+        .map { ToVisitUiState(restaurants = it) }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = ToVisitUiState()
+        )
 }

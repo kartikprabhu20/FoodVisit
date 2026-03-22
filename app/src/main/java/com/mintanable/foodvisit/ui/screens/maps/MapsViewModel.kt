@@ -1,33 +1,25 @@
 package com.mintanable.foodvisit.ui.screens.maps
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mintanable.foodvisit.Utils
+import com.mintanable.foodvisit.data.repository.PlacesRepository
 import com.mintanable.foodvisit.model.RestaurantInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
 class MapsViewModel @Inject constructor(
-    @ApplicationContext private val context: Context
+    repository: PlacesRepository
 ) : ViewModel() {
 
-    private val _restaurants = MutableStateFlow<List<RestaurantInfo>>(emptyList())
-    val restaurants: StateFlow<List<RestaurantInfo>> = _restaurants.asStateFlow()
-
-    init {
-        viewModelScope.launch {
-            _restaurants.value = withContext(Dispatchers.IO) {
-                Utils.getRestaurantInfoListFromDB(context)
-            }
-        }
-    }
+    /** Live — map markers update in real time whenever the wishlist changes. */
+    val restaurants: StateFlow<List<RestaurantInfo>> = repository.getWishlistedRestaurants()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = emptyList()
+        )
 }
