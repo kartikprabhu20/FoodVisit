@@ -23,9 +23,6 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.foodie.mintanable.model.RestaurantInfo
-import com.foodie.mintanable.ui.preview.sampleRestaurantInfo
-import com.foodie.mintanable.ui.theme.FoodVisitTheme
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap

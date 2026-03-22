@@ -3,8 +3,6 @@ package com.mintanable.foodvisit.ui.screens.maps
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.foodie.mintanable.Utils
-import com.foodie.mintanable.model.RestaurantInfo
 import com.mintanable.foodvisit.Utils
 import com.mintanable.foodvisit.model.RestaurantInfo
 import dagger.hilt.android.lifecycle.HiltViewModel

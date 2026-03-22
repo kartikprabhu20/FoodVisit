@@ -7,9 +7,9 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
-import com.foodie.mintanable.Activity.DetailActivity
-import com.foodie.mintanable.Activity.MainActivity
-import com.foodie.mintanable.R
+import com.mintanable.foodvisit.R
+import com.mintanable.foodvisit.activity.DetailActivity
+import com.mintanable.foodvisit.activity.MainActivity
 
 class FoodVisitWidget : AppWidgetProvider() {
 

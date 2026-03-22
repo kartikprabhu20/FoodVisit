@@ -6,11 +6,11 @@ import android.content.Context
 import android.database.Cursor
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import com.foodie.mintanable.database.RestaurantContract
-import com.foodie.mintanable.model.Location
-import com.foodie.mintanable.model.RestaurantInfo
-import com.foodie.mintanable.model.UserRating
-import com.mintanable.Restaurant
+import com.mintanable.foodvisit.database.RestaurantContract
+import com.mintanable.foodvisit.model.Location
+import com.mintanable.foodvisit.model.Restaurant
+import com.mintanable.foodvisit.model.RestaurantInfo
+import com.mintanable.foodvisit.model.UserRating
 
 object Utils {
 

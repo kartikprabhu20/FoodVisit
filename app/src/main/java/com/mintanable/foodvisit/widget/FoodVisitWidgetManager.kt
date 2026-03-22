@@ -4,10 +4,10 @@ import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.SharedPreferences
-import com.foodie.mintanable.R
-import com.foodie.mintanable.model.Restaurant
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.mintanable.foodvisit.R
+import com.mintanable.foodvisit.model.Restaurant
 import java.lang.reflect.Type
 
 class FoodVisitWidgetManager(private val context: Context) {

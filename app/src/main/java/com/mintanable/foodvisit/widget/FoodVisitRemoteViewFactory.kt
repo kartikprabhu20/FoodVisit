@@ -5,8 +5,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
-import com.foodie.mintanable.R
-import com.foodie.mintanable.model.Restaurant
+import com.mintanable.foodvisit.R
+import com.mintanable.foodvisit.model.Restaurant
 
 internal class FoodVisitRemoteViewFactory(private val context: Context) :
     RemoteViewsService.RemoteViewsFactory {

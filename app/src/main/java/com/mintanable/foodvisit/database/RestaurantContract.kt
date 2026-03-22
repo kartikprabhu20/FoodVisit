@@ -5,7 +5,7 @@ import android.provider.BaseColumns
 
 object RestaurantContract {
 
-    const val AUTHORITY = "com.foodie.foodvisit"
+    const val AUTHORITY = "com.mintanable.foodvisit"
     val BASE_CONTENT_URI: Uri = Uri.parse("content://$AUTHORITY")
     const val PATH_RESTAURANTS = "restaurants"
 

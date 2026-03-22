@@ -10,7 +10,7 @@ import javax.inject.Singleton
 class AppPreferenceManager @Inject constructor(@ApplicationContext context: Context) {
 
     companion object {
-        private const val PREF_FILE = "com.foodie.foodvisitr"
+        private const val PREF_FILE = "com.mintanable.foodvisit"
         private const val LOCATION = "LOCATION"
     }
 
