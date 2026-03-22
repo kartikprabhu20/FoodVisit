@@ -1,0 +1,165 @@
+package com.mintanable.foodvisit.ui.screens.home
+
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.mintanable.foodvisit.model.Restaurant
+import com.mintanable.foodvisit.ui.components.RestaurantCard
+import com.mintanable.foodvisit.ui.preview.sampleRestaurantInfo
+import com.mintanable.foodvisit.ui.preview.sampleRestaurantInfo2
+import com.mintanable.foodvisit.ui.preview.sampleRestaurantInfo3
+import com.mintanable.foodvisit.ui.theme.FoodVisitTheme
+
+@Composable
+fun HomeScreen(
+    onOpenDrawer: () -> Unit,
+    onRestaurantClick: (Restaurant) -> Unit,
+    viewModel: HomeViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) viewModel.refreshIfLocationChanged()
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+
+    HomeContent(
+        uiState = uiState,
+        onOpenDrawer = onOpenDrawer,
+        onRestaurantClick = onRestaurantClick
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun HomeContent(
+    uiState: HomeUiState,
+    onOpenDrawer: () -> Unit,
+    onRestaurantClick: (Restaurant) -> Unit
+) {
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(uiState.isOffline) {
+        if (uiState.isOffline) snackbarHostState.showSnackbar("No internet connection")
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("FoodVisit") },
+                navigationIcon = {
+                    IconButton(onClick = onOpenDrawer) {
+                        Icon(Icons.Default.Menu, contentDescription = "Open drawer")
+                    }
+                }
+            )
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            when {
+                uiState.isLoading -> CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                else -> LazyVerticalGrid(
+                    columns = GridCells.Fixed(3),
+                    contentPadding = PaddingValues(4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(uiState.restaurants) { info ->
+                        RestaurantCard(
+                            restaurant = info,
+                            onClick = { onRestaurantClick(Restaurant(info)) },
+                            modifier = Modifier.height(120.dp)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.S)
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun HomeContentLoadingPreview() {
+    FoodVisitTheme {
+        HomeContent(
+            uiState = HomeUiState(isLoading = true),
+            onOpenDrawer = {},
+            onRestaurantClick = {}
+        )
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.S)
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun HomeContentLoadedPreview() {
+    FoodVisitTheme {
+        HomeContent(
+            uiState = HomeUiState(
+                restaurants = listOf(
+                    sampleRestaurantInfo,
+                    sampleRestaurantInfo2,
+                    sampleRestaurantInfo3
+                )
+            ),
+            onOpenDrawer = {},
+            onRestaurantClick = {}
+        )
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.S)
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun HomeContentOfflinePreview() {
+    FoodVisitTheme {
+        HomeContent(
+            uiState = HomeUiState(isOffline = true),
+            onOpenDrawer = {},
+            onRestaurantClick = {}
+        )
+    }
+}
