@@ -50,7 +50,7 @@
             android:configChanges="screenSize|orientation"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
+                android:name="androidx.core.app.NavUtils.PARENT_ACTIVITY"
                 android:value="com.foodie.foodvisit.Activity.MainActivity" />
         </activity>
 
@@ -80,7 +80,7 @@
             android:parentActivityName=".Activity.MainActivity"
             >
             <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
+                android:name="androidx.core.app.NavUtils.PARENT_ACTIVITY"
                 android:value="com.foodie.foodvisit.Activity.MainActivity" />
         </activity>
 
