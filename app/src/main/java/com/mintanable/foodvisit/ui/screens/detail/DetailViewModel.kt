@@ -3,7 +3,7 @@ package com.mintanable.foodvisit.ui.screens.detail
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mintanable.foodvisit.data.repository.PlacesRepository
-import com.mintanable.foodvisit.model.RestaurantInfo
+import com.mintanable.core.model.RestaurantInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

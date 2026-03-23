@@ -36,7 +36,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.mintanable.foodvisit.model.Restaurant
+import com.mintanable.core.model.Restaurant
 import com.mintanable.foodvisit.ui.components.RestaurantCard
 import com.mintanable.foodvisit.ui.preview.sampleRestaurantInfo
 import com.mintanable.foodvisit.ui.preview.sampleRestaurantInfo2

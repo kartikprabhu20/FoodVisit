@@ -179,6 +179,9 @@ dependencies {
     // AdMob
     implementation 'com.google.android.gms:play-services-ads:23.3.0'
 
+    // Modules
+    implementation project(':core:model')
+
     // Testing
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'

@@ -6,8 +6,8 @@ import com.mintanable.foodvisit.data.mapper.PlaceMapper
 import com.mintanable.foodvisit.data.model.Resource
 import com.mintanable.foodvisit.data.remote.PlacesRemoteDataSource
 import com.mintanable.foodvisit.data.repository.PlacesRepository.Companion.CACHE_TTL_MS
-import com.mintanable.foodvisit.model.Restaurant
-import com.mintanable.foodvisit.model.RestaurantInfo
+import com.mintanable.core.model.Restaurant
+import com.mintanable.core.model.RestaurantInfo
 import com.mintanable.foodvisit.widget.FoodVisitWidgetManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers

@@ -36,7 +36,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.google.gson.Gson
 import androidx.compose.ui.tooling.preview.Preview
-import com.mintanable.foodvisit.model.Restaurant
+import com.mintanable.core.model.Restaurant
 import com.mintanable.foodvisit.ui.screens.aboutus.AboutUsScreen
 import com.mintanable.foodvisit.ui.screens.detail.DetailScreen
 import com.mintanable.foodvisit.ui.screens.home.HomeScreen

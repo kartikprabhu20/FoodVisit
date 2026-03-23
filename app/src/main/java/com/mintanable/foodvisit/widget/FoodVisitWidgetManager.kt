@@ -7,7 +7,7 @@ import android.content.SharedPreferences
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.mintanable.foodvisit.R
-import com.mintanable.foodvisit.model.Restaurant
+import com.mintanable.core.model.Restaurant
 import java.lang.reflect.Type
 
 class FoodVisitWidgetManager(private val context: Context) {

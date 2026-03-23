@@ -1,6 +1,6 @@
 package com.mintanable.foodvisit.ui.screens.home
 
-import com.mintanable.foodvisit.model.RestaurantInfo
+import com.mintanable.core.model.RestaurantInfo
 
 data class HomeUiState(
     val restaurants: List<RestaurantInfo> = emptyList(),

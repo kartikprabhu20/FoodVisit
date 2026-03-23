@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import com.mintanable.foodvisit.model.Restaurant
+import com.mintanable.core.model.Restaurant
 import com.mintanable.foodvisit.ui.preview.sampleRestaurant
 import com.mintanable.foodvisit.ui.theme.FoodVisitTheme
 

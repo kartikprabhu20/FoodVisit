@@ -3,7 +3,7 @@ package com.mintanable.foodvisit.ui.screens.maps
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mintanable.foodvisit.data.repository.PlacesRepository
-import com.mintanable.foodvisit.model.RestaurantInfo
+import com.mintanable.core.model.RestaurantInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

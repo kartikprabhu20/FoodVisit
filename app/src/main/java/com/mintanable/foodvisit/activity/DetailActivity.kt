@@ -8,7 +8,7 @@ import com.mintanable.foodvisit.ui.screens.detail.DetailScreen
 import com.mintanable.foodvisit.ui.theme.FoodVisitTheme
 import com.mintanable.foodvisit.widget.FoodVisitWidget
 import com.mintanable.foodvisit.widget.FoodVisitWidgetManager
-import com.mintanable.foodvisit.model.Restaurant
+import com.mintanable.core.model.Restaurant
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -30,21 +30,12 @@ class DetailActivity : ComponentActivity() {
         }
     }
 
-    /**
-     * Resolves the [Restaurant] from the intent.
-     * Supports two paths:
-     * - Widget deep link: RESTAURANT_LIST (JSON) + POSITION extras
-     * - App-internal: parcelable "restaurant" extra
-     */
+    /** Resolves the [Restaurant] from the widget deep-link intent extras. */
     private fun resolveRestaurant(): Restaurant? {
         val extras = intent.extras ?: return null
-        return if (extras.containsKey(FoodVisitWidget.Companion.RESTAURANT_LIST)) {
-            val list = extras.getString(FoodVisitWidget.Companion.RESTAURANT_LIST)
-            val pos = extras.getInt(FoodVisitWidget.Companion.POSITION, 0)
-            FoodVisitWidgetManager(applicationContext).getInfo(list, pos)
-        } else {
-            @Suppress("DEPRECATION")
-            extras.getParcelable("restaurant")
-        }
+        if (!extras.containsKey(FoodVisitWidget.Companion.RESTAURANT_LIST)) return null
+        val list = extras.getString(FoodVisitWidget.Companion.RESTAURANT_LIST)
+        val pos = extras.getInt(FoodVisitWidget.Companion.POSITION, 0)
+        return FoodVisitWidgetManager(applicationContext).getInfo(list, pos)
     }
 }

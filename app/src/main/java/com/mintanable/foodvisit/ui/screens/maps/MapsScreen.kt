@@ -29,7 +29,7 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.mintanable.foodvisit.model.RestaurantInfo
+import com.mintanable.core.model.RestaurantInfo
 import com.mintanable.foodvisit.ui.preview.sampleRestaurantInfo
 import com.mintanable.foodvisit.ui.theme.FoodVisitTheme
 

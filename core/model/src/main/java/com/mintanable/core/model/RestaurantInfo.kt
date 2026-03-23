@@ -1,11 +1,8 @@
-package com.mintanable.foodvisit.model
+package com.mintanable.core.model
 
-import android.os.Parcelable
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
-import kotlinx.parcelize.Parcelize
 
-@Parcelize
 data class RestaurantInfo(
     @SerializedName("apikey") @Expose val apikey: String? = null,
     @SerializedName("id") @Expose val id: String? = null,
@@ -27,8 +24,7 @@ data class RestaurantInfo(
     @SerializedName("deeplink") @Expose val deeplink: String? = null,
     @SerializedName("has_table_booking") @Expose val hasTableBooking: Int? = null,
     @SerializedName("events_url") @Expose val eventsUrl: String? = null
-) : Parcelable {
-    // String representations used by legacy DB/display code
+) {
     val hasOnlineDeliveryString: String get() = hasOnlineDelivery?.toString() ?: "null"
     val hasTableBookingString: String get() = hasTableBooking?.toString() ?: "null"
 }

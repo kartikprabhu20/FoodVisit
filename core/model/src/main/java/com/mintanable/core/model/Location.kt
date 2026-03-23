@@ -1,11 +1,8 @@
-package com.mintanable.foodvisit.model
+package com.mintanable.core.model
 
-import android.os.Parcelable
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
-import kotlinx.parcelize.Parcelize
 
-@Parcelize
 data class Location(
     @SerializedName("address") @Expose val address: String? = null,
     @SerializedName("locality") @Expose val locality: String? = null,
@@ -16,4 +13,4 @@ data class Location(
     @SerializedName("zipcode") @Expose val zipcode: String? = null,
     @SerializedName("country_id") @Expose val countryId: Int? = null,
     @SerializedName("locality_verbose") @Expose val localityVerbose: String? = null
-) : Parcelable
+)

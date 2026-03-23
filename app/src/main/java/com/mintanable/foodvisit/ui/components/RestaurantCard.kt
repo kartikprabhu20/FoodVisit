@@ -20,7 +20,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.mintanable.foodvisit.model.RestaurantInfo
+import com.mintanable.core.model.RestaurantInfo
 import com.mintanable.foodvisit.ui.preview.sampleRestaurantInfo
 import com.mintanable.foodvisit.ui.theme.FoodVisitTheme
 

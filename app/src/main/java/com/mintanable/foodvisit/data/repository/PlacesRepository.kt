@@ -1,8 +1,8 @@
 package com.mintanable.foodvisit.data.repository
 
 import com.mintanable.foodvisit.data.model.Resource
-import com.mintanable.foodvisit.model.Restaurant
-import com.mintanable.foodvisit.model.RestaurantInfo
+import com.mintanable.core.model.Restaurant
+import com.mintanable.core.model.RestaurantInfo
 import kotlinx.coroutines.flow.Flow
 
 interface PlacesRepository {

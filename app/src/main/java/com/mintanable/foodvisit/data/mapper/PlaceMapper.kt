@@ -4,10 +4,10 @@ import com.mintanable.foodvisit.BuildConfig
 import com.mintanable.foodvisit.data.local.entity.RestaurantEntity
 import com.mintanable.foodvisit.data.remote.dto.AddressComponentDto
 import com.mintanable.foodvisit.data.remote.dto.PlaceDto
-import com.mintanable.foodvisit.model.Location
-import com.mintanable.foodvisit.model.Restaurant
-import com.mintanable.foodvisit.model.RestaurantInfo
-import com.mintanable.foodvisit.model.UserRating
+import com.mintanable.core.model.Location
+import com.mintanable.core.model.Restaurant
+import com.mintanable.core.model.RestaurantInfo
+import com.mintanable.core.model.UserRating
 
 object PlaceMapper {
 

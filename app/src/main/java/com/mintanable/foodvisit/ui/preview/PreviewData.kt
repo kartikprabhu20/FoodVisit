@@ -1,9 +1,9 @@
 package com.mintanable.foodvisit.ui.preview
 
-import com.mintanable.foodvisit.model.Location
-import com.mintanable.foodvisit.model.Restaurant
-import com.mintanable.foodvisit.model.RestaurantInfo
-import com.mintanable.foodvisit.model.UserRating
+import com.mintanable.core.model.Location
+import com.mintanable.core.model.Restaurant
+import com.mintanable.core.model.RestaurantInfo
+import com.mintanable.core.model.UserRating
 
 internal val sampleRestaurantInfo = RestaurantInfo(
     id = "1",
