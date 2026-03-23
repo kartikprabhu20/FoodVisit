@@ -1,7 +1,5 @@
 package com.mintanable.foodvisit.ui.screens.maps
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,6 +14,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,9 +22,12 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
@@ -75,11 +77,27 @@ private fun MapsContent(
             val cameraPositionState = rememberCameraPositionState {
                 position = CameraPosition.fromLatLngZoom(LatLng(12.9716, 77.5946), 11f)
             }
+            LaunchedEffect(restaurants) {
+                val points = restaurants.mapNotNull { info ->
+                    val lat = info.location?.latitude?.toDoubleOrNull()
+                    val lon = info.location?.longitude?.toDoubleOrNull()
+                    if (lat != null && lon != null) LatLng(lat, lon) else null
+                }
+                if (points.isNotEmpty()) {
+                    val bounds = LatLngBounds.Builder().apply { points.forEach { include(it) } }.build()
+                    cameraPositionState.animate(CameraUpdateFactory.newLatLngBounds(bounds, 100))
+                }
+            }
             GoogleMap(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding),
-                cameraPositionState = cameraPositionState
+                cameraPositionState = cameraPositionState,
+                uiSettings = MapUiSettings(
+                    zoomGesturesEnabled = true,
+                    scrollGesturesEnabled = true,
+                    rotationGesturesEnabled = true
+                )
             ) {
                 restaurants.forEach { info ->
                     val lat = info.location?.latitude?.toDoubleOrNull()
