@@ -34,7 +34,6 @@ android {
         def localPropsFile = rootProject.file("local.properties")
         if (localPropsFile.exists()) localProps.load(localPropsFile.newDataInputStream())
 
-        buildConfigField "String", "ZOMATO_API_KEY",  "\"${localProps['ZOMATO_API_KEY'] ?: ''}\""
         buildConfigField "String", "GOOGLE_MAPS_KEY", "\"${localProps['GOOGLE_MAPS_KEY'] ?: ''}\""
         buildConfigField "String", "ADMOB_APP_ID",    "\"${localProps['ADMOB_APP_ID'] ?: ''}\""
 

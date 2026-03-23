@@ -132,7 +132,6 @@ private fun HomeContentLoadingPreview() {
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.S)
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun HomeContentLoadedPreview() {
@@ -151,7 +150,6 @@ private fun HomeContentLoadedPreview() {
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.S)
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun HomeContentOfflinePreview() {
