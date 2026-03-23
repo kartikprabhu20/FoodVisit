@@ -1,7 +1,10 @@
 package com.mintanable.foodvisit.ui.screens.settings
 
 data class SettingsUiState(
-    val selectedCityId: String = "4"
+    val selectedCityId: String = "4",
+    val searchQuery: String = "",
+    val locationLoading: Boolean = false,
+    val locationError: String? = null
 )
 
 // City id → display name mapping (matches legacy Zomato entity IDs)
