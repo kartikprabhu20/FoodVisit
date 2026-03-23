@@ -1,7 +1,7 @@
-package com.mintanable.foodvisit.di
+package com.mintanable.core.data.di
 
-import com.mintanable.foodvisit.data.repository.PlacesRepository
-import com.mintanable.foodvisit.data.repository.PlacesRepositoryImpl
+import com.mintanable.core.data.repository.PlacesRepository
+import com.mintanable.core.data.repository.PlacesRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

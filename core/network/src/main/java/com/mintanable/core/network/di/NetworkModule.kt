@@ -1,6 +1,6 @@
-package com.mintanable.foodvisit.di
+package com.mintanable.core.network.di
 
-import com.mintanable.foodvisit.data.remote.PlacesService
+import com.mintanable.core.network.PlacesService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

@@ -1,15 +1,12 @@
-package com.mintanable.foodvisit.data.repository
+package com.mintanable.core.data.repository
 
-import android.content.Context
-import com.mintanable.foodvisit.data.local.dao.RestaurantDao
-import com.mintanable.foodvisit.data.mapper.PlaceMapper
-import com.mintanable.foodvisit.data.model.Resource
-import com.mintanable.foodvisit.data.remote.PlacesRemoteDataSource
-import com.mintanable.foodvisit.data.repository.PlacesRepository.Companion.CACHE_TTL_MS
+import com.mintanable.core.data.local.dao.RestaurantDao
+import com.mintanable.core.data.mapper.PlaceMapper
+import com.mintanable.core.data.model.Resource
+import com.mintanable.core.data.repository.PlacesRepository.Companion.CACHE_TTL_MS
 import com.mintanable.core.model.Restaurant
 import com.mintanable.core.model.RestaurantInfo
-import com.mintanable.foodvisit.widget.FoodVisitWidgetManager
-import dagger.hilt.android.qualifiers.ApplicationContext
+import com.mintanable.core.network.PlacesRemoteDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
@@ -23,7 +20,7 @@ import javax.inject.Singleton
 class PlacesRepositoryImpl @Inject constructor(
     private val remoteDataSource: PlacesRemoteDataSource,
     private val dao: RestaurantDao,
-    @ApplicationContext private val context: Context
+    private val mapper: PlaceMapper
 ) : PlacesRepository {
 
     companion object {
@@ -49,7 +46,7 @@ class PlacesRepositoryImpl @Inject constructor(
                 remoteDataSource.searchRestaurants(cityName)
                     .onSuccess { response ->
                         val entities = response.places
-                            ?.map { PlaceMapper.toEntity(it, cityId) }
+                            ?.map { mapper.toEntity(it, cityId) }
                             ?: emptyList()
                         dao.upsertPreservingWishlist(entities)
                     }
@@ -63,13 +60,13 @@ class PlacesRepositoryImpl @Inject constructor(
             }
 
             dao.getRestaurantsByCity(cityId)
-                .map { entities -> Resource.Success(entities.map { PlaceMapper.toRestaurantInfo(it) }) }
+                .map { entities -> Resource.Success(entities.map { mapper.toRestaurantInfo(it) }) }
                 .collect { send(it) }
         }.flowOn(Dispatchers.IO)
 
     override fun getWishlistedRestaurants(): Flow<List<RestaurantInfo>> =
         dao.getWishlistedRestaurants()
-            .map { entities -> entities.map { PlaceMapper.toRestaurantInfo(it) } }
+            .map { entities -> entities.map { mapper.toRestaurantInfo(it) } }
             .flowOn(Dispatchers.IO)
 
     override suspend fun setWishlisted(restaurantInfo: RestaurantInfo, wishlisted: Boolean) {
@@ -78,14 +75,10 @@ class PlacesRepositoryImpl @Inject constructor(
 
             // If wishlisting and the restaurant is not in the DB (cache cleared), insert it.
             if (wishlisted && dao.getById(id) == null) {
-                dao.insertIfAbsent(PlaceMapper.toEntity(restaurantInfo))
+                dao.insertIfAbsent(mapper.toEntity(restaurantInfo))
             }
 
             dao.setWishlisted(id, wishlisted)
-
-            // Refresh widget data after every wishlist change.
-            val wishlistedList = getWishlistedRestaurantsOnce()
-            FoodVisitWidgetManager(context).updateRestaurants(wishlistedList)
         }
     }
 
@@ -94,6 +87,6 @@ class PlacesRepositoryImpl @Inject constructor(
 
     override suspend fun getWishlistedRestaurantsOnce(): List<Restaurant> =
         withContext(Dispatchers.IO) {
-            dao.getWishlistedRestaurantsOnce().map { PlaceMapper.toRestaurant(it) }
+            dao.getWishlistedRestaurantsOnce().map { mapper.toRestaurant(it) }
         }
 }

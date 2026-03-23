@@ -1,19 +1,20 @@
-package com.mintanable.foodvisit.data.remote
+package com.mintanable.core.network
 
-import com.mintanable.foodvisit.BuildConfig
-import com.mintanable.foodvisit.data.remote.dto.PlacesSearchRequest
-import com.mintanable.foodvisit.data.remote.dto.PlacesSearchResponse
+import com.mintanable.core.network.dto.PlacesSearchRequest
+import com.mintanable.core.network.dto.PlacesSearchResponse
 import javax.inject.Inject
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Singleton
 class PlacesRemoteDataSource @Inject constructor(
-    private val service: PlacesService
+    private val service: PlacesService,
+    @Named("placesApiKey") private val apiKey: String
 ) {
     suspend fun searchRestaurants(cityName: String): Result<PlacesSearchResponse> =
         runCatching {
             service.searchText(
-                apiKey = BuildConfig.GOOGLE_MAPS_KEY,
+                apiKey = apiKey,
                 fieldMask = PlacesService.FIELD_MASK,
                 request = PlacesSearchRequest(textQuery = "restaurants in $cityName")
             )

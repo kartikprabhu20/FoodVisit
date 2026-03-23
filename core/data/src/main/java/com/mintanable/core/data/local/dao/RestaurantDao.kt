@@ -1,11 +1,11 @@
-package com.mintanable.foodvisit.data.local.dao
+package com.mintanable.core.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.mintanable.foodvisit.data.local.entity.RestaurantEntity
+import com.mintanable.core.data.local.entity.RestaurantEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

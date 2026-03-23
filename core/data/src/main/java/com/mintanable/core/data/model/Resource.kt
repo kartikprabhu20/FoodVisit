@@ -1,4 +1,4 @@
-package com.mintanable.foodvisit.data.model
+package com.mintanable.core.data.model
 
 sealed class Resource<out T> {
     data object Loading : Resource<Nothing>()

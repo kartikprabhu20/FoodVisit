@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mintanable.foodvisit.AppPreferenceManager
 import com.mintanable.foodvisit.Utils
-import com.mintanable.foodvisit.data.model.Resource
-import com.mintanable.foodvisit.data.repository.PlacesRepository
+import com.mintanable.core.data.model.Resource
+import com.mintanable.core.data.repository.PlacesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job

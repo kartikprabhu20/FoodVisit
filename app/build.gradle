@@ -181,6 +181,8 @@ dependencies {
 
     // Modules
     implementation project(':core:model')
+    implementation project(':core:network')
+    implementation project(':core:data')
 
     // Testing
     testImplementation 'junit:junit:4.13.2'

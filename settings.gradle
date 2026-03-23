@@ -15,3 +15,5 @@ dependencyResolutionManagement {
 rootProject.name = "FoodVisit"
 include ':app'
 include ':core:model'
+include ':core:network'
+include ':core:data'

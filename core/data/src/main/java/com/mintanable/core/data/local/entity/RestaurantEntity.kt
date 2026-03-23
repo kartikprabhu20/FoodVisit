@@ -1,4 +1,4 @@
-package com.mintanable.foodvisit.data.local.entity
+package com.mintanable.core.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

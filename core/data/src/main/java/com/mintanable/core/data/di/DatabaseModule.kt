@@ -1,9 +1,9 @@
-package com.mintanable.foodvisit.di
+package com.mintanable.core.data.di
 
 import android.content.Context
 import androidx.room.Room
-import com.mintanable.foodvisit.data.local.FoodVisitDatabase
-import com.mintanable.foodvisit.data.local.dao.RestaurantDao
+import com.mintanable.core.data.local.FoodVisitDatabase
+import com.mintanable.core.data.local.dao.RestaurantDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

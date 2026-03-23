@@ -1,4 +1,4 @@
-package com.mintanable.foodvisit.data.remote.dto
+package com.mintanable.core.network.dto
 
 import com.google.gson.annotations.SerializedName
 

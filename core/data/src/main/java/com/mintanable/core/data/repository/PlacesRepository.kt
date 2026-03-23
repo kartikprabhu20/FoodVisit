@@ -1,6 +1,6 @@
-package com.mintanable.foodvisit.data.repository
+package com.mintanable.core.data.repository
 
-import com.mintanable.foodvisit.data.model.Resource
+import com.mintanable.core.data.model.Resource
 import com.mintanable.core.model.Restaurant
 import com.mintanable.core.model.RestaurantInfo
 import kotlinx.coroutines.flow.Flow
@@ -21,7 +21,6 @@ interface PlacesRepository {
     /**
      * Toggles wishlist status. If [wishlisted] = true and the restaurant is not in the DB
      * (e.g. cache was cleared), the entity is inserted from [restaurantInfo] first.
-     * Also triggers a widget data refresh.
      */
     suspend fun setWishlisted(restaurantInfo: RestaurantInfo, wishlisted: Boolean)
 

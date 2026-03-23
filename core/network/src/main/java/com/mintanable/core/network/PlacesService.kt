@@ -1,7 +1,7 @@
-package com.mintanable.foodvisit.data.remote
+package com.mintanable.core.network
 
-import com.mintanable.foodvisit.data.remote.dto.PlacesSearchRequest
-import com.mintanable.foodvisit.data.remote.dto.PlacesSearchResponse
+import com.mintanable.core.network.dto.PlacesSearchRequest
+import com.mintanable.core.network.dto.PlacesSearchResponse
 import retrofit2.http.Body
 import retrofit2.http.Header
 import retrofit2.http.POST

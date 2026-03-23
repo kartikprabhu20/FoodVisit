@@ -1,15 +1,20 @@
-package com.mintanable.foodvisit.data.mapper
+package com.mintanable.core.data.mapper
 
-import com.mintanable.foodvisit.BuildConfig
-import com.mintanable.foodvisit.data.local.entity.RestaurantEntity
-import com.mintanable.foodvisit.data.remote.dto.AddressComponentDto
-import com.mintanable.foodvisit.data.remote.dto.PlaceDto
+import com.mintanable.core.data.local.entity.RestaurantEntity
 import com.mintanable.core.model.Location
 import com.mintanable.core.model.Restaurant
 import com.mintanable.core.model.RestaurantInfo
 import com.mintanable.core.model.UserRating
+import com.mintanable.core.network.dto.AddressComponentDto
+import com.mintanable.core.network.dto.PlaceDto
+import javax.inject.Inject
+import javax.inject.Named
+import javax.inject.Singleton
 
-object PlaceMapper {
+@Singleton
+class PlaceMapper @Inject constructor(
+    @Named("placesApiKey") private val apiKey: String
+) {
 
     // ── PlaceDto → RestaurantEntity ──────────────────────────────────────────
 
@@ -126,17 +131,13 @@ object PlaceMapper {
     /** Builds the Places API photo URL from a photo resource name. */
     private fun String.toPhotoUrl(): String =
         "https://places.googleapis.com/v1/$this/media" +
-        "?maxWidthPx=800&key=${BuildConfig.GOOGLE_MAPS_KEY}"
+        "?maxWidthPx=800&key=$apiKey"
 
     private val GENERIC_TYPES = setOf(
         "restaurant", "food", "point_of_interest", "establishment",
         "store", "meal_delivery", "meal_takeaway"
     )
 
-    /**
-     * Converts a Places types list to a human-readable cuisine string.
-     * e.g. ["italian_restaurant", "pizza_restaurant", "food"] → "Italian, Pizza"
-     */
     private fun List<String>.toCuisineString(): String? {
         val specific = filter { it !in GENERIC_TYPES }
             .map { type ->
