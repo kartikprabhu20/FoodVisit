@@ -1,7 +1,6 @@
 package com.mintanable.foodvisit.ui.screens.home
 
-import android.os.Build
-import androidx.annotation.RequiresApi
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -26,9 +25,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -75,6 +78,8 @@ private fun HomeContent(
     onRestaurantClick: (Restaurant) -> Unit
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
+    var columnCount by remember { mutableIntStateOf(3) }
+    var zoomScale by remember { mutableFloatStateOf(1f) }
 
     LaunchedEffect(uiState.isOffline) {
         if (uiState.isOffline) snackbarHostState.showSnackbar("No internet connection")
@@ -97,11 +102,29 @@ private fun HomeContent(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                .pointerInput(Unit) {
+                    detectTransformGestures { _, _, zoom, _ ->
+                        zoomScale *= zoom
+
+                        if (zoomScale > 1.5f && columnCount > 1) {
+                            columnCount--
+                            zoomScale = 1f
+                        } else if (zoomScale < 0.5f && columnCount < 3) {
+                            columnCount++
+                            zoomScale = 1f
+                        }
+                    }
+                }
         ) {
+            val cardHeight = when (columnCount) {
+                1 -> 200.dp
+                2 -> 150.dp
+                else -> 120.dp
+            }
             when {
                 uiState.isLoading -> CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 else -> LazyVerticalGrid(
-                    columns = GridCells.Fixed(3),
+                    columns = GridCells.Fixed(columnCount),
                     contentPadding = PaddingValues(4.dp),
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -111,7 +134,7 @@ private fun HomeContent(
                         RestaurantCard(
                             restaurant = info,
                             onClick = { onRestaurantClick(Restaurant(info)) },
-                            modifier = Modifier.height(120.dp)
+                            modifier = Modifier.height(cardHeight)
                         )
                     }
                 }
