@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mintanable.foodvisit.AppPreferenceManager
 import com.mintanable.foodvisit.Utils
-import com.mintanable.core.common.Resource
+import com.mintanable.core.common.LoadingStatus
 import com.mintanable.core.data.repository.PlacesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -42,10 +42,10 @@ class HomeViewModel @Inject constructor(
         collectJob = viewModelScope.launch {
             repository.getRestaurants(cityId).collect { resource ->
                 when (resource) {
-                    is Resource.Loading -> _uiState.update {
+                    is LoadingStatus.Loading -> _uiState.update {
                         it.copy(isLoading = true, error = null)
                     }
-                    is Resource.Success -> _uiState.update {
+                    is LoadingStatus.Success -> _uiState.update {
                         it.copy(
                             isLoading = false,
                             restaurants = resource.data,
@@ -53,7 +53,7 @@ class HomeViewModel @Inject constructor(
                             isOffline = !Utils.isOnline(context)
                         )
                     }
-                    is Resource.Error -> _uiState.update {
+                    is LoadingStatus.Error -> _uiState.update {
                         it.copy(isLoading = false, error = resource.message, isOffline = true)
                     }
                 }
