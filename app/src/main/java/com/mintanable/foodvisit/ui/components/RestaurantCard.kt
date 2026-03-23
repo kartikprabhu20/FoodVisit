@@ -72,7 +72,6 @@ fun RestaurantCard(
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.S)
 @Preview(showBackground = true)
 @Composable
 private fun RestaurantCardPreview() {

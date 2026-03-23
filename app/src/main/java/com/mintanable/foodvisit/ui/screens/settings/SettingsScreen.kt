@@ -93,7 +93,6 @@ private fun SettingsContent(
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.S)
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun SettingsContentPreview() {

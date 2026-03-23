@@ -13,15 +13,12 @@ interface RestaurantDao {
 
     // ── Queries ──────────────────────────────────────────────────────────────
 
-    /** Live list of non-wishlisted restaurants for a city (home / maps search results). */
     @Query("SELECT * FROM restaurants WHERE cityId = :cityId AND isWishlisted = 0 ORDER BY aggregateRating DESC")
     fun getRestaurantsByCity(cityId: String): Flow<List<RestaurantEntity>>
 
-    /** Live list of all wishlisted restaurants (To Visit / Maps screens). */
     @Query("SELECT * FROM restaurants WHERE isWishlisted = 1 ORDER BY name ASC")
     fun getWishlistedRestaurants(): Flow<List<RestaurantEntity>>
 
-    /** One-shot version for widget refresh after a wishlist toggle. */
     @Query("SELECT * FROM restaurants WHERE isWishlisted = 1 ORDER BY name ASC")
     suspend fun getWishlistedRestaurantsOnce(): List<RestaurantEntity>
 
@@ -43,31 +40,27 @@ interface RestaurantDao {
     // ── Writes ───────────────────────────────────────────────────────────────
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun replaceAll(restaurants: List<RestaurantEntity>)
+    suspend fun replaceAll(restaurants: List<RestaurantEntity>): List<Long>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertIfAbsent(restaurant: RestaurantEntity)
+    suspend fun insertIfAbsent(restaurant: RestaurantEntity): Long
 
     @Query("UPDATE restaurants SET isWishlisted = :wishlisted WHERE id = :id")
-    suspend fun setWishlisted(id: String, wishlisted: Boolean)
+    suspend fun setWishlisted(id: String, wishlisted: Boolean): Int
 
     @Query("UPDATE restaurants SET isWishlisted = 1 WHERE id IN (:ids)")
-    suspend fun restoreWishlisted(ids: List<String>)
+    suspend fun restoreWishlisted(ids: List<String>): Int
 
     /**
      * Replaces all cached results for a city while preserving [isWishlisted] flags.
-     *
-     * Strategy:
-     * 1. Snapshot currently wishlisted IDs.
-     * 2. REPLACE all rows (resets isWishlisted = false for everything).
-     * 3. Restore wishlisted = 1 for previously-wishlisted IDs.
      */
     @Transaction
-    suspend fun upsertPreservingWishlist(restaurants: List<RestaurantEntity>) {
+    suspend fun upsertPreservingWishlist(restaurants: List<RestaurantEntity>): Int {
         val wishlistedIds = getWishlistedIds()
         replaceAll(restaurants)
         if (wishlistedIds.isNotEmpty()) {
             restoreWishlisted(wishlistedIds)
         }
+        return restaurants.size
     }
 }

@@ -159,7 +159,6 @@ private fun LabeledRow(label: String, value: String?) {
     )
 }
 
-@RequiresApi(Build.VERSION_CODES.S)
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun DetailContentPreview() {
@@ -173,7 +172,6 @@ private fun DetailContentPreview() {
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.S)
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun DetailContentWishlistedPreview() {

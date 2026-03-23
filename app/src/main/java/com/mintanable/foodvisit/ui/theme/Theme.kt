@@ -39,7 +39,6 @@ private val DarkColors = darkColorScheme(
     onBackground     = OnSurfaceDark
 )
 
-@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun FoodVisitTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -47,10 +46,12 @@ fun FoodVisitTheme(
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
-        dynamicColor && darkTheme  -> dynamicDarkColorScheme(LocalContext.current)
-        dynamicColor && !darkTheme -> dynamicLightColorScheme(LocalContext.current)
-        darkTheme                  -> DarkColors
-        else                       -> LightColors
+        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+            if (darkTheme) dynamicDarkColorScheme(LocalContext.current) else dynamicLightColorScheme(LocalContext.current)
+        }
+
+        darkTheme -> DarkColors
+        else -> LightColors
     }
     MaterialTheme(
         colorScheme = colorScheme,

@@ -96,7 +96,6 @@ private fun MapsContent(
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.S)
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun MapsContentPreview() {
