@@ -1,4 +1,4 @@
-package com.mintanable.core.data.model
+package com.mintanable.core.common
 
 sealed class Resource<out T> {
     data object Loading : Resource<Nothing>()

@@ -18,6 +18,7 @@ android {
 
 dependencies {
     implementation project(':core:model')
+    implementation project(':core:common')
     implementation project(':core:network')
 
     implementation 'com.google.dagger:hilt-android:2.57'

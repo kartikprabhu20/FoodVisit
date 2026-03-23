@@ -1,6 +1,6 @@
 package com.mintanable.core.data.repository
 
-import com.mintanable.core.data.model.Resource
+import com.mintanable.core.common.Resource
 import com.mintanable.core.model.Restaurant
 import com.mintanable.core.model.RestaurantInfo
 import kotlinx.coroutines.flow.Flow

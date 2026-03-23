@@ -2,7 +2,7 @@ package com.mintanable.core.data.repository
 
 import com.mintanable.core.data.local.dao.RestaurantDao
 import com.mintanable.core.data.mapper.PlaceMapper
-import com.mintanable.core.data.model.Resource
+import com.mintanable.core.common.Resource
 import com.mintanable.core.data.repository.PlacesRepository.Companion.CACHE_TTL_MS
 import com.mintanable.core.model.Restaurant
 import com.mintanable.core.model.RestaurantInfo
