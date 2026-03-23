@@ -6,9 +6,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.DrawerValue
@@ -137,7 +137,7 @@ private fun AppDrawerContent(
 
         val items = listOf(
             Triple(Screen.Home.route,     "Home",     Icons.Default.Home),
-            Triple(Screen.ToVisit.route,  "To Visit", Icons.Default.List),
+            Triple(Screen.ToVisit.route,  "To Visit", Icons.AutoMirrored.Filled.List),
             Triple(Screen.Maps.route,     "Maps",     Icons.Default.Map),
             Triple(Screen.Settings.route, "Settings", Icons.Default.Settings)
         )

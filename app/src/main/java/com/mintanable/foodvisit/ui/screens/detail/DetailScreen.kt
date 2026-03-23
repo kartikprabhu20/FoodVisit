@@ -1,33 +1,56 @@
 package com.mintanable.foodvisit.ui.screens.detail
 
-import android.os.Build
-import androidx.annotation.RequiresApi
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
-import androidx.compose.material3.Card
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.DeliveryDining
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.filled.Restaurant
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
+import androidx.compose.material.icons.filled.TableRestaurant
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -58,7 +81,7 @@ fun DetailScreen(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 private fun DetailContent(
     restaurant: Restaurant?,
@@ -67,16 +90,18 @@ private fun DetailContent(
     onToggleWishlist: () -> Unit
 ) {
     val info = restaurant?.restaurantInfo
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(info?.name.orEmpty()) },
+                title = {},
                 navigationIcon = {
                     IconButton(onClick = onNavigateUp) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
             )
         },
         floatingActionButton = {
@@ -95,38 +120,206 @@ private fun DetailContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
+                .padding(bottom = innerPadding.calculateBottomPadding())
                 .verticalScroll(rememberScrollState())
         ) {
-            AsyncImage(
-                model = info?.featuredImage,
-                contentDescription = info?.name,
-                contentScale = ContentScale.Crop,
+            // Hero image with gradient overlay + restaurant name
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(256.dp)
-            )
-
-            Spacer(Modifier.height(16.dp))
-
-            InfoCard(title = "Location") {
-                LabeledRow("Address", info?.location?.address)
-                LabeledRow("Locality", info?.location?.locality)
-                LabeledRow("City", info?.location?.city)
-                LabeledRow("ZIP", info?.location?.zipcode)
+                    .height(280.dp)
+            ) {
+                AsyncImage(
+                    model = info?.featuredImage,
+                    contentDescription = info?.name,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+                // Gradient overlay
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.75f)),
+                                startY = 120f
+                            )
+                        )
+                )
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(16.dp)
+                ) {
+                    Text(
+                        text = info?.name.orEmpty(),
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = Color.White
+                    )
+                    // Price range stars
+                    val priceRange = info?.priceRange ?: 0
+                    if (priceRange > 0) {
+                        Spacer(Modifier.height(6.dp))
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            repeat(priceRange.coerceAtMost(4)) {
+                                Icon(
+                                    Icons.Default.Star,
+                                    contentDescription = null,
+                                    tint = Color(0xFFFFD700),
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                            repeat((4 - priceRange).coerceAtLeast(0)) {
+                                Icon(
+                                    Icons.Default.StarBorder,
+                                    contentDescription = null,
+                                    tint = Color.White.copy(alpha = 0.6f),
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                        }
+                    }
+                }
             }
 
-            InfoCard(title = "Details") {
-                LabeledRow("Cuisines", info?.cuisines)
-                LabeledRow("Avg cost for two", info?.averageCostForTwo?.let { "${info.currency} $it" })
-                LabeledRow("Online delivery", if (info?.hasOnlineDelivery == 1) "Yes" else "No")
-                LabeledRow("Table booking", if (info?.hasTableBooking == 1) "Yes" else "No")
+            // Cuisine chips
+            val cuisines = info?.cuisines
+            if (!cuisines.isNullOrBlank()) {
+                val chips = cuisines.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+                FlowRow(
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    chips.forEach { cuisine ->
+                        SuggestionChip(
+                            onClick = {},
+                            label = { Text(cuisine, style = MaterialTheme.typography.labelMedium) },
+                            icon = {
+                                Icon(
+                                    Icons.Default.Restaurant,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(14.dp)
+                                )
+                            }
+                        )
+                    }
+                }
+            } else {
+                Spacer(Modifier.height(12.dp))
             }
 
-            InfoCard(title = "Reviews") {
-                LabeledRow("Rating", info?.userRating?.aggregateRating)
-                LabeledRow("Rating text", info?.userRating?.ratingText)
-                LabeledRow("Votes", info?.userRating?.votes)
+            // Location card
+            ElevatedCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            Icons.Default.LocationOn,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text("Location", style = MaterialTheme.typography.titleMedium)
+                    }
+                    Spacer(Modifier.height(8.dp))
+                    val address = listOfNotNull(
+                        info?.location?.address,
+                        info?.location?.locality,
+                        info?.location?.city,
+                        info?.location?.zipcode
+                    ).filter { it.isNotBlank() }.joinToString(", ")
+                    if (address.isNotBlank()) {
+                        Text(
+                            text = address,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    val lat = info?.location?.latitude?.toDoubleOrNull()
+                    val lon = info?.location?.longitude?.toDoubleOrNull()
+                    if (lat != null && lon != null) {
+                        Spacer(Modifier.height(4.dp))
+                        TextButton(
+                            onClick = {
+                                val uri = Uri.parse("geo:$lat,$lon?q=${Uri.encode(info?.name ?: "")}")
+                                context.startActivity(Intent(Intent.ACTION_VIEW, uri))
+                            }
+                        ) {
+                            Icon(
+                                Icons.Default.Map,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(Modifier.width(6.dp))
+                            Text("View on Map")
+                        }
+                    }
+                }
+            }
+
+            // Rating card
+            ElevatedCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    // Rating row
+                    val rating = info?.userRating?.aggregateRating
+                    val ratingText = info?.userRating?.ratingText
+                    val votes = info?.userRating?.votes
+                    if (!rating.isNullOrBlank()) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                Icons.Default.Star,
+                                contentDescription = null,
+                                tint = Color(0xFFFFD700),
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Spacer(Modifier.width(6.dp))
+                            Text(
+                                text = rating,
+                                style = MaterialTheme.typography.titleLarge,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            if (!ratingText.isNullOrBlank()) {
+                                Spacer(Modifier.width(8.dp))
+                                Text(
+                                    text = ratingText,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                            if (!votes.isNullOrBlank()) {
+                                Spacer(Modifier.width(8.dp))
+                                Text(
+                                    text = "($votes votes)",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                        Spacer(Modifier.height(12.dp))
+                    }
+                    // Table booking row
+                    FeatureRow(
+                        icon = Icons.Default.TableRestaurant,
+                        label = "Table Booking",
+                        available = info?.hasTableBooking == 1
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    // Delivery row
+                    FeatureRow(
+                        icon = Icons.Default.DeliveryDining,
+                        label = "Online Delivery",
+                        available = info?.hasOnlineDelivery == 1
+                    )
+                }
             }
 
             Spacer(Modifier.height(80.dp))
@@ -135,28 +328,37 @@ private fun DetailContent(
 }
 
 @Composable
-private fun InfoCard(title: String, content: @Composable () -> Unit) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(title, style = MaterialTheme.typography.titleMedium)
-            Spacer(Modifier.height(8.dp))
-            content()
-        }
+private fun FeatureRow(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    label: String,
+    available: Boolean
+) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Icon(
+            icon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(20.dp)
+        )
+        Spacer(Modifier.width(8.dp))
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.weight(1f)
+        )
+        Icon(
+            imageVector = if (available) Icons.Default.CheckCircle else Icons.Default.StarBorder,
+            contentDescription = null,
+            tint = if (available) Color(0xFF4CAF50) else MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(20.dp)
+        )
+        Spacer(Modifier.width(4.dp))
+        Text(
+            text = if (available) "Yes" else "No",
+            style = MaterialTheme.typography.bodySmall,
+            color = if (available) Color(0xFF4CAF50) else MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
-}
-
-@Composable
-private fun LabeledRow(label: String, value: String?) {
-    if (value.isNullOrEmpty()) return
-    Text(
-        text = "$label: $value",
-        style = MaterialTheme.typography.bodyMedium,
-        modifier = Modifier.padding(vertical = 2.dp)
-    )
 }
 
 @Preview(showBackground = true, showSystemUi = true)
