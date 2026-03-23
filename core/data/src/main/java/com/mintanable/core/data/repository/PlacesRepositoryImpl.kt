@@ -2,7 +2,7 @@ package com.mintanable.core.data.repository
 
 import com.mintanable.core.data.local.dao.RestaurantDao
 import com.mintanable.core.data.mapper.PlaceMapper
-import com.mintanable.core.common.Resource
+import com.mintanable.core.common.LoadingStatus
 import com.mintanable.core.data.repository.PlacesRepository.Companion.CACHE_TTL_MS
 import com.mintanable.core.model.Restaurant
 import com.mintanable.core.model.RestaurantInfo
@@ -33,9 +33,9 @@ class PlacesRepositoryImpl @Inject constructor(
         )
     }
 
-    override fun getRestaurants(cityId: String): Flow<Resource<List<RestaurantInfo>>> =
+    override fun getRestaurants(cityId: String): Flow<LoadingStatus<List<RestaurantInfo>>> =
         channelFlow {
-            send(Resource.Loading)
+            send(LoadingStatus.Loading)
 
             val cachedCount = dao.getCachedCount(cityId)
             val lastCachedAt = dao.getLastCachedAt(cityId) ?: 0L
@@ -52,7 +52,7 @@ class PlacesRepositoryImpl @Inject constructor(
                     }
                     .onFailure { error ->
                         if (cachedCount == 0) {
-                            send(Resource.Error(error.message ?: "Network error", error))
+                            send(LoadingStatus.Error(error.message ?: "Network error", error))
                             return@channelFlow
                         }
                         // Stale cache exists — fall through and serve it below
@@ -60,7 +60,7 @@ class PlacesRepositoryImpl @Inject constructor(
             }
 
             dao.getRestaurantsByCity(cityId)
-                .map { entities -> Resource.Success(entities.map { mapper.toRestaurantInfo(it) }) }
+                .map { entities -> LoadingStatus.Success(entities.map { mapper.toRestaurantInfo(it) }) }
                 .collect { send(it) }
         }.flowOn(Dispatchers.IO)
 
