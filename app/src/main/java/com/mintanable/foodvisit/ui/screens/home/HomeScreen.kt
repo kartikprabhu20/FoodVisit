@@ -131,13 +131,19 @@ private fun HomeContent(
                     detectTransformGestures { _, _, zoom, _ ->
                         zoomScale *= zoom
 
-                        if (zoomScale > 1.5f && columnCount > 1) {
-                            columnCount--
-                            zoomScale = 1f
-                        } else if (zoomScale < 0.5f && columnCount < 3) {
-                            columnCount++
-                            zoomScale = 1f
+                        when {
+                            zoomScale > 1.35f && columnCount > 1 -> {
+                                columnCount--
+                                zoomScale = 1f
+                            }
+                            zoomScale < 0.74f && columnCount < 3 -> {
+                                columnCount++
+                                zoomScale = 1f
+                            }
                         }
+
+                        if (columnCount == 1) zoomScale = zoomScale.coerceAtMost(1.35f)
+                        if (columnCount == 3) zoomScale = zoomScale.coerceAtLeast(0.74f)
                     }
                 }
         ) {
