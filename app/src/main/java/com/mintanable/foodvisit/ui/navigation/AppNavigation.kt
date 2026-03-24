@@ -1,6 +1,8 @@
 package com.mintanable.foodvisit.ui.navigation
 
 import android.net.Uri
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -46,6 +48,7 @@ import com.mintanable.foodvisit.ui.screens.tovisit.ToVisitScreen
 import com.mintanable.foodvisit.ui.theme.FoodVisitTheme
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun AppNavigation(navController: NavHostController = rememberNavController()) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -79,41 +82,50 @@ fun AppNavigation(navController: NavHostController = rememberNavController()) {
             )
         }
     ) {
-        NavHost(
-            navController = navController,
-            startDestination = Screen.Home.route,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            composable(Screen.Home.route) {
-                HomeScreen(onOpenDrawer = openDrawer, onRestaurantClick = navigateToDetail)
-            }
-            composable(Screen.ToVisit.route) {
-                ToVisitScreen(onOpenDrawer = openDrawer, onRestaurantClick = navigateToDetail)
-            }
-            composable(Screen.Maps.route) {
-                MapsScreen(onOpenDrawer = openDrawer)
-            }
-            composable(Screen.Settings.route) {
-                SettingsScreen(
-                    onOpenDrawer = openDrawer,
-                    onNavigateUp = { navController.navigateUp() }
-                )
-            }
-            composable(Screen.AboutUs.route) {
-                AboutUsScreen(onOpenDrawer = openDrawer)
-            }
-            composable(
-                route = Screen.Detail.route,
-                arguments = listOf(navArgument("restaurantJson") { type = NavType.StringType })
-            ) { entry ->
-                val json = Uri.decode(entry.arguments?.getString("restaurantJson") ?: "")
-                val restaurant = remember(json) {
-                    try { gson.fromJson(json, Restaurant::class.java) } catch (_: Exception) { null }
+        SharedTransitionLayout {
+            NavHost(
+                navController = navController,
+                startDestination = Screen.Home.route,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                composable(Screen.Home.route) {
+                    HomeScreen(
+                        onOpenDrawer = openDrawer,
+                        onRestaurantClick = navigateToDetail,
+                        sharedTransitionScope = this@SharedTransitionLayout,
+                        animatedVisibilityScope = this
+                    )
                 }
-                DetailScreen(
-                    restaurant = restaurant,
-                    onNavigateUp = { navController.navigateUp() }
-                )
+                composable(Screen.ToVisit.route) {
+                    ToVisitScreen(onOpenDrawer = openDrawer, onRestaurantClick = navigateToDetail)
+                }
+                composable(Screen.Maps.route) {
+                    MapsScreen(onOpenDrawer = openDrawer)
+                }
+                composable(Screen.Settings.route) {
+                    SettingsScreen(
+                        onOpenDrawer = openDrawer,
+                        onNavigateUp = { navController.navigateUp() }
+                    )
+                }
+                composable(Screen.AboutUs.route) {
+                    AboutUsScreen(onOpenDrawer = openDrawer)
+                }
+                composable(
+                    route = Screen.Detail.route,
+                    arguments = listOf(navArgument("restaurantJson") { type = NavType.StringType })
+                ) { entry ->
+                    val json = Uri.decode(entry.arguments?.getString("restaurantJson") ?: "")
+                    val restaurant = remember(json) {
+                        try { gson.fromJson(json, Restaurant::class.java) } catch (_: Exception) { null }
+                    }
+                    DetailScreen(
+                        restaurant = restaurant,
+                        onNavigateUp = { navController.navigateUp() },
+                        sharedTransitionScope = this@SharedTransitionLayout,
+                        animatedVisibilityScope = this
+                    )
+                }
             }
         }
     }

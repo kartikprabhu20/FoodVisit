@@ -1,7 +1,10 @@
 package com.mintanable.foodvisit.ui.components
 
-import android.os.Build
-import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -24,11 +27,14 @@ import com.mintanable.core.model.RestaurantInfo
 import com.mintanable.foodvisit.ui.preview.sampleRestaurantInfo
 import com.mintanable.foodvisit.ui.theme.FoodVisitTheme
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun RestaurantCard(
     restaurant: RestaurantInfo,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null
 ) {
     Card(
         onClick = onClick,
@@ -37,11 +43,40 @@ fun RestaurantCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
+            val imageModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null) {
+                with(sharedTransitionScope) {
+                    Modifier
+                        .fillMaxSize()
+                        .sharedElement(
+                            rememberSharedContentState(key = "image-${restaurant.id}"),
+                            animatedVisibilityScope = animatedVisibilityScope
+                        )
+                }
+            } else {
+                Modifier.fillMaxSize()
+            }
+
+            val textModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null) {
+                with(sharedTransitionScope) {
+                    Modifier
+                        .align(Alignment.TopStart)
+                        .padding(4.dp)
+                        .sharedElement(
+                            rememberSharedContentState(key = "title-${restaurant.id}"),
+                            animatedVisibilityScope = animatedVisibilityScope
+                        )
+                }
+            } else {
+                Modifier
+                    .align(Alignment.TopStart)
+                    .padding(4.dp)
+            }
+
             AsyncImage(
                 model = restaurant.featuredImage,
                 contentDescription = restaurant.name,
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
+                modifier = imageModifier
             )
 
             // Title overlay at top
@@ -51,9 +86,7 @@ fun RestaurantCard(
                 color = Color.White,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .padding(4.dp)
+                modifier = textModifier
             )
 
             // Rating badge at bottom-end
@@ -76,10 +109,16 @@ fun RestaurantCard(
 @Composable
 private fun RestaurantCardPreview() {
     FoodVisitTheme {
-        RestaurantCard(
-            restaurant = sampleRestaurantInfo,
-            onClick = {},
-            modifier = Modifier.size(width = 120.dp, height = 120.dp)
-        )
+        SharedTransitionLayout {
+            AnimatedVisibility(visible = true) {
+                RestaurantCard(
+                    restaurant = sampleRestaurantInfo,
+                    onClick = {},
+                    modifier = Modifier.size(width = 120.dp, height = 120.dp),
+                    sharedTransitionScope = this@SharedTransitionLayout,
+                    animatedVisibilityScope = this
+                )
+            }
+        }
     }
 }

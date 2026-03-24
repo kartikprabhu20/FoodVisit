@@ -1,5 +1,12 @@
 package com.mintanable.foodvisit.ui.screens.home
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -46,10 +53,13 @@ import com.mintanable.foodvisit.ui.preview.sampleRestaurantInfo2
 import com.mintanable.foodvisit.ui.preview.sampleRestaurantInfo3
 import com.mintanable.foodvisit.ui.theme.FoodVisitTheme
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun HomeScreen(
     onOpenDrawer: () -> Unit,
     onRestaurantClick: (Restaurant) -> Unit,
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -66,20 +76,35 @@ fun HomeScreen(
     HomeContent(
         uiState = uiState,
         onOpenDrawer = onOpenDrawer,
-        onRestaurantClick = onRestaurantClick
+        onRestaurantClick = onRestaurantClick,
+        sharedTransitionScope = sharedTransitionScope,
+        animatedVisibilityScope = animatedVisibilityScope
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
 private fun HomeContent(
     uiState: HomeUiState,
     onOpenDrawer: () -> Unit,
-    onRestaurantClick: (Restaurant) -> Unit
+    onRestaurantClick: (Restaurant) -> Unit,
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     var columnCount by remember { mutableIntStateOf(3) }
     var zoomScale by remember { mutableFloatStateOf(1f) }
+
+    val targetCardHeight = when (columnCount) {
+        1 -> 200.dp
+        2 -> 150.dp
+        else -> 120.dp
+    }
+    val cardHeight by animateDpAsState(
+        targetValue = targetCardHeight,
+        animationSpec = spring(dampingRatio = 0.8f, stiffness = 300f),
+        label = "cardHeight"
+    )
 
     LaunchedEffect(uiState.isOffline) {
         if (uiState.isOffline) snackbarHostState.showSnackbar("No internet connection")
@@ -116,11 +141,6 @@ private fun HomeContent(
                     }
                 }
         ) {
-            val cardHeight = when (columnCount) {
-                1 -> 200.dp
-                2 -> 150.dp
-                else -> 120.dp
-            }
             when {
                 uiState.isLoading -> CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 else -> LazyVerticalGrid(
@@ -130,11 +150,18 @@ private fun HomeContent(
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    items(uiState.restaurants) { info ->
+                    items(
+                        uiState.restaurants,
+                        key = { it.id ?: it.hashCode().toString() }
+                    ) { info ->
                         RestaurantCard(
                             restaurant = info,
                             onClick = { onRestaurantClick(Restaurant(info)) },
-                            modifier = Modifier.height(cardHeight)
+                            modifier = Modifier
+                                .height(cardHeight)
+                                .animateItem(),
+                            sharedTransitionScope = sharedTransitionScope,
+                            animatedVisibilityScope = animatedVisibilityScope
                         )
                     }
                 }
@@ -147,11 +174,17 @@ private fun HomeContent(
 @Composable
 private fun HomeContentLoadingPreview() {
     FoodVisitTheme {
-        HomeContent(
-            uiState = HomeUiState(isLoading = true),
-            onOpenDrawer = {},
-            onRestaurantClick = {}
-        )
+        SharedTransitionLayout {
+            AnimatedVisibility(visible = true) {
+                HomeContent(
+                    uiState = HomeUiState(isLoading = true),
+                    onOpenDrawer = {},
+                    onRestaurantClick = {},
+                    sharedTransitionScope = this@SharedTransitionLayout,
+                    animatedVisibilityScope = this
+                )
+            }
+        }
     }
 }
 
@@ -159,17 +192,23 @@ private fun HomeContentLoadingPreview() {
 @Composable
 private fun HomeContentLoadedPreview() {
     FoodVisitTheme {
-        HomeContent(
-            uiState = HomeUiState(
-                restaurants = listOf(
-                    sampleRestaurantInfo,
-                    sampleRestaurantInfo2,
-                    sampleRestaurantInfo3
+        SharedTransitionLayout {
+            AnimatedVisibility(visible = true) {
+                HomeContent(
+                    uiState = HomeUiState(
+                        restaurants = listOf(
+                            sampleRestaurantInfo,
+                            sampleRestaurantInfo2,
+                            sampleRestaurantInfo3
+                        )
+                    ),
+                    onOpenDrawer = {},
+                    onRestaurantClick = {},
+                    sharedTransitionScope = this@SharedTransitionLayout,
+                    animatedVisibilityScope = this
                 )
-            ),
-            onOpenDrawer = {},
-            onRestaurantClick = {}
-        )
+            }
+        }
     }
 }
 
@@ -177,10 +216,16 @@ private fun HomeContentLoadedPreview() {
 @Composable
 private fun HomeContentOfflinePreview() {
     FoodVisitTheme {
-        HomeContent(
-            uiState = HomeUiState(isOffline = true),
-            onOpenDrawer = {},
-            onRestaurantClick = {}
-        )
+        SharedTransitionLayout {
+            AnimatedVisibility(visible = true) {
+                HomeContent(
+                    uiState = HomeUiState(isOffline = true),
+                    onOpenDrawer = {},
+                    onRestaurantClick = {},
+                    sharedTransitionScope = this@SharedTransitionLayout,
+                    animatedVisibilityScope = this
+                )
+            }
+        }
     }
 }
