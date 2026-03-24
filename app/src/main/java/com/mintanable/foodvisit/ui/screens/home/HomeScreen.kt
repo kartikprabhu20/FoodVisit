@@ -7,6 +7,9 @@ import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -128,22 +131,41 @@ private fun HomeContent(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .pointerInput(Unit) {
-                    detectTransformGestures { _, _, zoom, _ ->
-                        zoomScale *= zoom
+                    awaitEachGesture {
+                        var zoomAccumulator = 1f
 
-                        when {
-                            zoomScale > 1.35f && columnCount > 1 -> {
-                                columnCount--
-                                zoomScale = 1f
-                            }
-                            zoomScale < 0.74f && columnCount < 3 -> {
-                                columnCount++
-                                zoomScale = 1f
-                            }
+                        //Wait for TWO fingers to touch down
+                        val firstDown = awaitFirstDown(requireUnconsumed = false)
+                        val secondDown = awaitPointerEvent().changes.firstOrNull { it.id != firstDown.id }
+
+                        if (secondDown != null) {
+                            // Pinch starting!
+                            do {
+                                val event = awaitPointerEvent()
+                                val zoom = event.calculateZoom() // Relative change since last event
+
+                                if (zoom != 1f) {
+                                    zoomAccumulator *= zoom
+
+                                    // Adjust these thresholds to your liking (Lower = More Sensitive)
+                                    val zoomInThreshold = 1.35f
+                                    val zoomOutThreshold = 0.85f
+
+                                    when {
+                                        zoomAccumulator > zoomInThreshold && columnCount > 1 -> {
+                                            columnCount--
+                                            zoomAccumulator = 1f // Reset after trigger
+                                            event.changes.forEach { it.consume() }
+                                        }
+                                        zoomAccumulator < zoomOutThreshold && columnCount < 3 -> {
+                                            columnCount++
+                                            zoomAccumulator = 1f // Reset after trigger
+                                            event.changes.forEach { it.consume() }
+                                        }
+                                    }
+                                }
+                            } while (event.changes.any { it.pressed })
                         }
-
-                        if (columnCount == 1) zoomScale = zoomScale.coerceAtMost(1.35f)
-                        if (columnCount == 3) zoomScale = zoomScale.coerceAtLeast(0.74f)
                     }
                 }
         ) {
