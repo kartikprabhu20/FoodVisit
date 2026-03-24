@@ -8,10 +8,8 @@ import androidx.compose.animation.EnterExitState
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.animation.core.EaseOutCubic
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloat
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -55,6 +53,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.material.icons.automirrored.filled.StarHalf
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -68,7 +67,11 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
+import com.mintanable.foodvisit.currencySymbolFor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
@@ -238,11 +241,26 @@ private fun DetailContent(
                         color = Color.White,
                         modifier = titleModifier
                     )
-                    // Price range stars — animate fill left-to-right on entry
                     val priceRange = info?.priceRange ?: 0
-                    if (priceRange > 0) {
+                    val ratingStr = info?.userRating?.aggregateRating
+                    if (!ratingStr.isNullOrBlank() || priceRange > 0) {
                         Spacer(Modifier.height(6.dp))
-                        AnimatedPriceStars(target = priceRange.coerceIn(1, 4))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            if (!ratingStr.isNullOrBlank()) {
+                                val ratingFloat = (ratingStr.toFloatOrNull() ?: 0f).coerceIn(0f, 5f)
+                                AnimatedUserRating(rating = ratingFloat, ratingText = ratingStr)
+                            }
+                            if (priceRange > 0) {
+                                AnimatedPriceCurrency(
+                                    target = priceRange.coerceIn(1, 4),
+                                    symbol = currencySymbolFor(info?.currency)
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -393,44 +411,112 @@ private fun DetailContent(
     }
 }
 
+private enum class StarFill { EMPTY, HALF, FULL }
+
+private fun computeStarFills(rating: Float): List<StarFill> {
+    val full = rating.toInt().coerceIn(0, 5)
+    val fraction = rating - full
+    val hasHalf = fraction >= 0.5f && full < 5
+    return List(5) { index ->
+        when {
+            index < full -> StarFill.FULL
+            index == full && hasHalf -> StarFill.HALF
+            else -> StarFill.EMPTY
+        }
+    }
+}
+
 @Composable
-private fun AnimatedPriceStars(target: Int) {
+private fun AnimatedUserRating(rating: Float, ratingText: String) {
+    val fills = remember(rating) { computeStarFills(rating) }
+    val nonEmptyCount = fills.count { it != StarFill.EMPTY }
+    var visibleCount by remember { mutableIntStateOf(0) }
+
+    LaunchedEffect(rating) {
+        visibleCount = 0
+        delay(500)
+        repeat(nonEmptyCount) {
+            delay(180L)
+            visibleCount++
+        }
+    }
+
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        repeat(5) { index ->
+            AnimatedStar(fill = if (index < visibleCount) fills[index] else StarFill.EMPTY)
+        }
+        Spacer(Modifier.width(4.dp))
+        Text(
+            text = "($ratingText)",
+            style = MaterialTheme.typography.labelSmall,
+            color = Color.White.copy(alpha = 0.85f)
+        )
+    }
+}
+
+@Composable
+private fun AnimatedPriceCurrency(target: Int, symbol: String) {
     var filledCount by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(target) {
         filledCount = 0
-        delay(600)
+        delay(500)
         repeat(target) {
-            delay(250L)
+            delay(200L)
             filledCount++
         }
     }
 
     Row(verticalAlignment = Alignment.CenterVertically) {
         repeat(4) { index ->
-            AnimatedStar(filled = index < filledCount)
+            AnimatedCurrencyUnit(filled = index < filledCount, symbol = symbol)
         }
     }
 }
 
 @Composable
-private fun AnimatedStar(filled: Boolean) {
+private fun AnimatedCurrencyUnit(filled: Boolean, symbol: String) {
     val scale by animateFloatAsState(
         targetValue = if (filled) 1f else 0f,
+        animationSpec = spring(dampingRatio = 0.45f, stiffness = 500f),
+        label = "currencyScale"
+    )
+    Box(contentAlignment = Alignment.Center, modifier = Modifier.size(20.dp)) {
+        CurrencyIcon(symbol = symbol, faded = true)
+        Box(modifier = Modifier.graphicsLayer { scaleX = scale; scaleY = scale; alpha = scale }) {
+            CurrencyIcon(symbol = symbol, faded = false)
+        }
+    }
+}
+
+@Composable
+private fun CurrencyIcon(symbol: String, faded: Boolean) {
+    Text(
+        text = symbol,
+        color = if (faded) Color.White.copy(alpha = 0.35f) else Color(0xFF80CBC4),
+        fontSize = 13.sp,
+        fontWeight = if (faded) FontWeight.Light else FontWeight.Bold,
+        textAlign = TextAlign.Center,
+        modifier = Modifier.width(16.dp)
+    )
+}
+
+@Composable
+private fun AnimatedStar(fill: StarFill) {
+    val scale by animateFloatAsState(
+        targetValue = if (fill != StarFill.EMPTY) 1f else 0f,
         animationSpec = spring(dampingRatio = 0.45f, stiffness = 500f),
         label = "starScale"
     )
     Box(contentAlignment = Alignment.Center, modifier = Modifier.size(20.dp)) {
-
         Icon(
             imageVector = Icons.Default.StarBorder,
             contentDescription = null,
             tint = Color.White.copy(alpha = 0.35f),
             modifier = Modifier.size(18.dp)
         )
-
         Icon(
-            imageVector = Icons.Default.Star,
+            imageVector = if (fill == StarFill.HALF) Icons.AutoMirrored.Filled.StarHalf else Icons.Default.Star,
             contentDescription = null,
             tint = Color(0xFFFFD700),
             modifier = Modifier
@@ -534,21 +620,35 @@ private fun FeatureRowPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun AnimatedStarPreview() {
+private fun AnimatedUserRatingPreview() {
     FoodVisitTheme {
-        Row(modifier = Modifier.padding(16.dp)) {
-            AnimatedStar(filled = true)
-            Spacer(Modifier.width(8.dp))
-            AnimatedStar(filled = false)
+        Column(modifier = Modifier.padding(16.dp)) {
+            // 4.2 → 4 full stars
+            AnimatedUserRating(rating = 4.2f, ratingText = "4.2")
+            Spacer(Modifier.height(8.dp))
+            // 4.6 → 4 full + half star
+            AnimatedUserRating(rating = 4.6f, ratingText = "4.6")
+            Spacer(Modifier.height(8.dp))
+            // 5.0 → 5 full stars
+            AnimatedUserRating(rating = 5.0f, ratingText = "5.0")
         }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun AnimatedPriceStarsPreview() {
+private fun AnimatedPriceCurrencyPreview() {
     FoodVisitTheme {
-        AnimatedPriceStars(3)
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text("India (₹)", color = Color.White, fontSize = 12.sp)
+            AnimatedPriceCurrency(target = 3, symbol = "₹")
+            Spacer(Modifier.height(8.dp))
+            Text("USA ($)", color = Color.White, fontSize = 12.sp)
+            AnimatedPriceCurrency(target = 2, symbol = "$")
+            Spacer(Modifier.height(8.dp))
+            Text("Europe (€)", color = Color.White, fontSize = 12.sp)
+            AnimatedPriceCurrency(target = 4, symbol = "€")
+        }
     }
 }
 

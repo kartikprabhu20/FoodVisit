@@ -28,7 +28,7 @@ class PlaceMapper @Inject constructor(
             thumb          = dto.photos?.firstOrNull()?.name?.toPhotoUrl(),
             cuisines       = dto.types?.toCuisineString(),
             priceRange     = dto.priceLevel?.toPriceRange(),
-            currency       = null,
+            currency       = components.countryCode(),
             averageCostForTwo = null,
             hasTableBooking  = dto.reservable.toInt(),
             hasOnlineDelivery = dto.delivery.toInt(),
@@ -178,4 +178,8 @@ class PlaceMapper @Inject constructor(
 
     private fun List<AddressComponentDto>.firstOfType(type: String): String? =
         firstOrNull { it.types?.contains(type) == true }?.longText
+
+    /** Returns the ISO 3166-1 alpha-2 country code (e.g. "IN", "US", "GB"). */
+    private fun List<AddressComponentDto>.countryCode(): String? =
+        firstOrNull { it.types?.contains("country") == true }?.shortText
 }
